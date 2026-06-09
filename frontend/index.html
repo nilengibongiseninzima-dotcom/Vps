@@ -16,6 +16,7 @@
                     <button class="nav-btn active" onclick="showPage('dashboard')">Dashboard</button>
                     <button class="nav-btn" onclick="showPage('servers')">Servers</button>
                     <button class="nav-btn" onclick="showPage('create')">Create Server</button>
+                    <button class="nav-btn" onclick="showPage('config')">Config</button>
                     <button class="nav-btn" onclick="showPage('settings')">Settings</button>
                     <button class="nav-btn logout" onclick="logout()">Logout</button>
                 </div>
@@ -41,7 +42,10 @@
                         <button type="submit" class="btn btn-primary btn-block">Login</button>
                     </form>
 
-                    <p class="auth-toggle">Don't have an account? <a href="#" onclick="toggleAuth()">Sign Up</a></p>
+                    <p class="auth-toggle">Don't have an account? <a href="#" onclick="toggleAuth(event)">Sign Up for FREE</a></p>
+                    <div class="free-tier-banner">
+                        <p>✨ <strong>NEW!</strong> Get 1 Month FREE with fast servers!</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -66,6 +70,11 @@
                     <div class="stat-value" id="uptime-percent">99.9%</div>
                     <div class="stat-label">Uptime</div>
                 </div>
+                <div class="stat-card premium">
+                    <div class="stat-label">⭐ Your Plan</div>
+                    <div class="stat-value" id="user-plan">FREE</div>
+                    <div class="stat-detail" id="plan-expires">Expires in 30 days</div>
+                </div>
             </div>
 
             <div class="chart-container">
@@ -83,6 +92,9 @@
         <!-- Create Server -->
         <div id="create" class="page">
             <h2>Create New VPN Server</h2>
+            <div class="pricing-banner" id="pricing-banner">
+                <p>FREE TIER: Enjoy 1 Month FREE! After that, paid plans start at R49/month</p>
+            </div>
             <div class="form-container">
                 <form id="create-server-form" onsubmit="handleCreateServer(event)">
                     <div class="form-row">
@@ -110,15 +122,17 @@
                             <label>Server Type</label>
                             <select id="server-type" onchange="updateServerType(this.value)" required>
                                 <option value="">Select Type</option>
-                                <option value="basic">Basic (512MB RAM)</option>
-                                <option value="standard">Standard (1GB RAM)</option>
-                                <option value="premium">Premium (2GB RAM)</option>
-                                <option value="enterprise">Enterprise (4GB RAM)</option>
+                                <option value="free">🎁 FREE TIER - Fast Server (1 Month)</option>
+                                <option value="basic">Basic (512MB RAM) - R49/month</option>
+                                <option value="standard">Standard (1GB RAM) - R99/month</option>
+                                <option value="premium">Premium (2GB RAM) - R199/month</option>
+                                <option value="enterprise">Enterprise (4GB RAM) - R399/month</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label>Bandwidth Limit</label>
                             <select id="bandwidth" required>
+                                <option value="50">50 GB/month (FREE)</option>
                                 <option value="100">100 GB/month</option>
                                 <option value="500">500 GB/month</option>
                                 <option value="1000">1 TB/month</option>
@@ -129,11 +143,12 @@
 
                     <div class="form-group">
                         <label>Max Connections</label>
-                        <input type="number" id="max-connections" min="1" max="100" value="10" required>
+                        <input type="number" id="max-connections" min="1" max="100" value="5" required>
                     </div>
 
                     <div class="price-info">
-                        <p>Monthly Cost: <strong id="price-display">R0.00</strong></p>
+                        <p>Cost: <strong id="price-display">FREE FOR 1 MONTH</strong></p>
+                        <p id="price-details" style="font-size: 0.9rem; color: #6b7280; margin-top: 0.5rem;"></p>
                     </div>
 
                     <div class="form-row">
@@ -154,6 +169,37 @@
             </div>
         </div>
 
+        <!-- Config Page -->
+        <div id="config" class="page">
+            <h2>WireGuard Configuration</h2>
+            <div class="config-container">
+                <div class="config-section">
+                    <h3>📋 Your VPN Configuration</h3>
+                    <div class="config-display" id="config-display">
+                        <p>Select a server to view configuration</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="copyConfig()">Copy Config</button>
+                    <button class="btn btn-secondary" onclick="downloadConfig()">Download Config</button>
+                </div>
+
+                <div class="config-section">
+                    <h3>🔧 Quick Setup Guide</h3>
+                    <div class="setup-guide">
+                        <h4>Step 1: Install WireGuard</h4>
+                        <p>Download WireGuard app from Google Play Store</p>
+                        <button class="btn btn-small" onclick="openPlayStore()">Open Play Store</button>
+
+                        <h4>Step 2: Import Configuration</h4>
+                        <p>Scan QR code or import .conf file</p>
+                        <div id="qr-code" class="qr-placeholder">QR Code will appear here</div>
+
+                        <h4>Step 3: Connect</h4>
+                        <p>Toggle the switch to connect to VPN</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Settings -->
         <div id="settings" class="page">
             <h2>Account Settings</h2>
@@ -167,6 +213,10 @@
                     <div class="form-group">
                         <label>Email</label>
                         <input type="email" id="settings-email" placeholder="your@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Current Plan</label>
+                        <input type="text" id="plan-info" placeholder="FREE - Expires in 30 days" disabled>
                     </div>
                     <button class="btn btn-primary" onclick="saveProfile()">Save Profile</button>
                 </div>
@@ -182,8 +232,9 @@
 
                 <div class="setting-section">
                     <h3>Billing</h3>
+                    <p>Current Balance: <strong>R0.00</strong></p>
                     <button class="btn btn-primary" onclick="showPage('billing')">View Invoices</button>
-                    <button class="btn btn-secondary">Update Payment Method</button>
+                    <button class="btn btn-secondary">Add Payment Method</button>
                 </div>
             </div>
         </div>
