@@ -3,246 +3,212 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZIVPN-ZA Dashboard | Manage Your VPN Servers</title>
+    <title>ZIVPN - VPN Configuration Manager</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <!-- Navigation -->
-        <nav class="navbar">
-            <div class="nav-content">
-                <h1 class="logo">🌍 ZIVPN-ZA</h1>
-                <div class="nav-menu">
-                    <button class="nav-btn active" onclick="showPage('dashboard')">Dashboard</button>
-                    <button class="nav-btn" onclick="showPage('servers')">Servers</button>
-                    <button class="nav-btn" onclick="showPage('create')">Create Server</button>
-                    <button class="nav-btn" onclick="showPage('config')">Config</button>
-                    <button class="nav-btn" onclick="showPage('settings')">Settings</button>
-                    <button class="nav-btn logout" onclick="logout()">Logout</button>
-                </div>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1 class="app-title">🌐 ZIVPN</h1>
+                <p class="app-subtitle">Fast VPN for South Africa</p>
             </div>
+            <div class="header-status">
+                <span id="connection-status" class="status-indicator">● Offline</span>
+                <button class="btn-header" onclick="toggleMenu()">☰ Menu</button>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="app-nav" id="app-nav">
+            <a href="#" class="nav-item active" onclick="navigateTo('servers')">🖥️ Servers</a>
+            <a href="#" class="nav-item" onclick="navigateTo('config')">⚙️ Config</a>
+            <a href="#" class="nav-item" onclick="navigateTo('create')">➕ Create</a>
+            <a href="#" class="nav-item" onclick="navigateTo('account')">👤 Account</a>
+            <a href="#" class="nav-item" onclick="navigateTo('help')">❓ Help</a>
         </nav>
 
-        <!-- Login Page -->
-        <div id="login-page" class="page active">
-            <div class="auth-container">
-                <div class="auth-box">
-                    <h2>Welcome to ZIVPN-ZA</h2>
-                    <p>South African Premium VPN Service</p>
-                    
-                    <form id="login-form" onsubmit="handleLogin(event)">
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input type="email" id="login-email" placeholder="your@email.com" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Password</label>
-                            <input type="password" id="login-password" placeholder="Enter password" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-block">Login</button>
-                    </form>
+        <!-- Main Content -->
+        <main class="app-content">
+            <!-- Servers List Page -->
+            <section id="page-servers" class="page active">
+                <h2>Available Servers</h2>
+                <div class="servers-container" id="servers-container"></div>
+            </section>
 
-                    <p class="auth-toggle">Don't have an account? <a href="#" onclick="toggleAuth(event)">Sign Up for FREE</a></p>
-                    <div class="free-tier-banner">
-                        <p>✨ <strong>NEW!</strong> Get 1 Month FREE with fast servers!</p>
+            <!-- Configuration Page -->
+            <section id="page-config" class="page">
+                <h2>VPN Configuration</h2>
+                <div class="config-panel">
+                    <div class="config-section">
+                        <h3>Selected Server</h3>
+                        <div id="selected-server" class="info-box">No server selected</div>
                     </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- Main Dashboard -->
-        <div id="dashboard" class="page">
-            <h2>Dashboard</h2>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-value" id="total-servers">0</div>
-                    <div class="stat-label">Active Servers</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="total-users">0</div>
-                    <div class="stat-label">Connected Users</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="total-bandwidth">0 GB</div>
-                    <div class="stat-label">Bandwidth Used</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="uptime-percent">99.9%</div>
-                    <div class="stat-label">Uptime</div>
-                </div>
-                <div class="stat-card premium">
-                    <div class="stat-label">⭐ Your Plan</div>
-                    <div class="stat-value" id="user-plan">FREE</div>
-                    <div class="stat-detail" id="plan-expires">Expires in 30 days</div>
-                </div>
-            </div>
-
-            <div class="chart-container">
-                <h3>Server Status Overview</h3>
-                <div id="server-status" class="status-grid"></div>
-            </div>
-        </div>
-
-        <!-- Servers List -->
-        <div id="servers" class="page">
-            <h2>Your VPN Servers</h2>
-            <div class="servers-list" id="servers-list"></div>
-        </div>
-
-        <!-- Create Server -->
-        <div id="create" class="page">
-            <h2>Create New VPN Server</h2>
-            <div class="pricing-banner" id="pricing-banner">
-                <p>FREE TIER: Enjoy 1 Month FREE! After that, paid plans start at R49/month</p>
-            </div>
-            <div class="form-container">
-                <form id="create-server-form" onsubmit="handleCreateServer(event)">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Server Name</label>
-                            <input type="text" id="server-name" placeholder="e.g., Johannesburg-1" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Location</label>
-                            <select id="server-location" required>
-                                <option value="">Select Location</option>
-                                <option value="johannesburg">🏢 Johannesburg, Gauteng</option>
-                                <option value="cape_town">🏖️ Cape Town, Western Cape</option>
-                                <option value="durban">🌊 Durban, KwaZulu-Natal</option>
-                                <option value="pretoria">🏛️ Pretoria, Gauteng</option>
-                                <option value="bloemfontein">🌾 Bloemfontein, Free State</option>
-                                <option value="port_elizabeth">🐘 Port Elizabeth, Eastern Cape</option>
-                                <option value="isando">🏭 Isando, Johannesburg</option>
-                            </select>
+                    <div class="config-section">
+                        <h3>Protocol Settings</h3>
+                        <div class="protocol-selector">
+                            <label class="protocol-option">
+                                <input type="radio" name="protocol" value="openvpn" checked>
+                                OpenVPN (UDP)
+                            </label>
+                            <label class="protocol-option">
+                                <input type="radio" name="protocol" value="v2ray">
+                                V2Ray (UDP)
+                            </label>
+                            <label class="protocol-option">
+                                <input type="radio" name="protocol" value="ssh">
+                                SSH Tunnel
+                            </label>
                         </div>
                     </div>
 
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label>Server Type</label>
-                            <select id="server-type" onchange="updateServerType(this.value)" required>
-                                <option value="">Select Type</option>
-                                <option value="free">🎁 FREE TIER - Fast Server (1 Month)</option>
-                                <option value="basic">Basic (512MB RAM) - R49/month</option>
-                                <option value="standard">Standard (1GB RAM) - R99/month</option>
-                                <option value="premium">Premium (2GB RAM) - R199/month</option>
-                                <option value="enterprise">Enterprise (4GB RAM) - R399/month</option>
-                            </select>
+                    <div class="config-section">
+                        <h3>Configuration File</h3>
+                        <textarea id="config-display" class="config-textarea" readonly></textarea>
+                        <div class="button-group">
+                            <button class="btn btn-primary" onclick="copyConfig()">📋 Copy Config</button>
+                            <button class="btn btn-secondary" onclick="downloadConfig()">⬇️ Download</button>
+                            <button class="btn btn-success" onclick="generateQR()">📱 QR Code</button>
                         </div>
-                        <div class="form-group">
-                            <label>Bandwidth Limit</label>
-                            <select id="bandwidth" required>
-                                <option value="50">50 GB/month (FREE)</option>
-                                <option value="100">100 GB/month</option>
-                                <option value="500">500 GB/month</option>
-                                <option value="1000">1 TB/month</option>
-                                <option value="unlimited">Unlimited</option>
-                            </select>
-                        </div>
+                    </div>
+
+                    <div id="qr-code" class="qr-container" style="display:none;"></div>
+                </div>
+            </section>
+
+            <!-- Create Server Page -->
+            <section id="page-create" class="page">
+                <h2>Create New Server</h2>
+                <form id="create-form" class="form-container" onsubmit="handleCreateServer(event)">
+                    <div class="form-group">
+                        <label>Server Name</label>
+                        <input type="text" id="form-name" placeholder="e.g., Johannesburg-1" required>
                     </div>
 
                     <div class="form-group">
-                        <label>Max Connections</label>
-                        <input type="number" id="max-connections" min="1" max="100" value="5" required>
+                        <label>Location</label>
+                        <select id="form-location" required>
+                            <option value="">Select Location</option>
+                            <option value="johannesburg">🏢 Johannesburg, Gauteng</option>
+                            <option value="cape-town">🏖️ Cape Town, Western Cape</option>
+                            <option value="durban">🌊 Durban, KwaZulu-Natal</option>
+                            <option value="pretoria">🏛️ Pretoria, Gauteng</option>
+                            <option value="bloemfontein">🌾 Bloemfontein, Free State</option>
+                            <option value="port-elizabeth">🐘 Port Elizabeth, Eastern Cape</option>
+                            <option value="isando">🏭 Isando, Johannesburg</option>
+                        </select>
                     </div>
 
-                    <div class="price-info">
-                        <p>Cost: <strong id="price-display">FREE FOR 1 MONTH</strong></p>
-                        <p id="price-details" style="font-size: 0.9rem; color: #6b7280; margin-top: 0.5rem;"></p>
+                    <div class="form-group">
+                        <label>VPN Type</label>
+                        <select id="form-vpn-type" required>
+                            <option value="">Select Type</option>
+                            <option value="openvpn">OpenVPN UDP</option>
+                            <option value="v2ray">V2Ray UDP</option>
+                            <option value="ssh">SSH Tunnel</option>
+                        </select>
                     </div>
 
-                    <div class="form-row">
-                        <label class="checkbox">
-                            <input type="checkbox" id="auto-backup">
-                            Enable Auto Backup
-                        </label>
-                        <label class="checkbox">
-                            <input type="checkbox" id="ddos-protection" checked>
-                            DDoS Protection (R50/month)
-                        </label>
+                    <div class="form-group">
+                        <label>Plan Type</label>
+                        <select id="form-plan" required>
+                            <option value="free">🎁 FREE (1 Month) - 50GB</option>
+                            <option value="basic">Basic - R49/month</option>
+                            <option value="pro">Pro - R99/month - 500GB</option>
+                            <option value="premium">Premium - R199/month - Unlimited</option>
+                        </select>
                     </div>
 
-                    <button type="submit" class="btn btn-success btn-block btn-large">Create Server</button>
+                    <div class="form-group">
+                        <label>Port Range</label>
+                        <input type="number" id="form-port" min="1024" max="65535" placeholder="Default: 1194" value="1194">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block">Create Server</button>
                 </form>
+            </section>
 
-                <div class="pricing-table" id="pricing-table"></div>
-            </div>
-        </div>
-
-        <!-- Config Page -->
-        <div id="config" class="page">
-            <h2>WireGuard Configuration</h2>
-            <div class="config-container">
-                <div class="config-section">
-                    <h3>📋 Your VPN Configuration</h3>
-                    <div class="config-display" id="config-display">
-                        <p>Select a server to view configuration</p>
+            <!-- Account Page -->
+            <section id="page-account" class="page">
+                <h2>Account Settings</h2>
+                <div class="account-container">
+                    <div class="account-section">
+                        <h3>Profile</h3>
+                        <div class="profile-info">
+                            <p><strong>Username:</strong> <span id="username">User123</span></p>
+                            <p><strong>Email:</strong> <span id="email">user@zivpn.com</span></p>
+                            <p><strong>Plan:</strong> <span id="plan" class="badge badge-free">FREE - 30 days left</span></p>
+                            <p><strong>Data Used:</strong> <span id="data-used">2.3 GB / 50 GB</span></p>
+                        </div>
                     </div>
-                    <button class="btn btn-primary" onclick="copyConfig()">Copy Config</button>
-                    <button class="btn btn-secondary" onclick="downloadConfig()">Download Config</button>
-                </div>
 
-                <div class="config-section">
-                    <h3>🔧 Quick Setup Guide</h3>
-                    <div class="setup-guide">
-                        <h4>Step 1: Install WireGuard</h4>
-                        <p>Download WireGuard app from Google Play Store</p>
-                        <button class="btn btn-small" onclick="openPlayStore()">Open Play Store</button>
+                    <div class="account-section">
+                        <h3>API Token</h3>
+                        <div class="token-box">
+                            <code id="api-token">zivpn_sk_test_xxxxxxxxxxxx</code>
+                            <button class="btn btn-small" onclick="copyToken()">Copy</button>
+                        </div>
+                    </div>
 
-                        <h4>Step 2: Import Configuration</h4>
-                        <p>Scan QR code or import .conf file</p>
-                        <div id="qr-code" class="qr-placeholder">QR Code will appear here</div>
-
-                        <h4>Step 3: Connect</h4>
-                        <p>Toggle the switch to connect to VPN</p>
+                    <div class="account-section">
+                        <h3>Quick Actions</h3>
+                        <button class="btn btn-secondary" onclick="logout()">Logout</button>
+                        <button class="btn btn-danger" onclick="deleteAccount()">Delete Account</button>
                     </div>
                 </div>
-            </div>
-        </div>
+            </section>
 
-        <!-- Settings -->
-        <div id="settings" class="page">
-            <h2>Account Settings</h2>
-            <div class="settings-container">
-                <div class="setting-section">
-                    <h3>Profile</h3>
-                    <div class="form-group">
-                        <label>Full Name</label>
-                        <input type="text" id="full-name" placeholder="Your Name">
+            <!-- Help Page -->
+            <section id="page-help" class="page">
+                <h2>Help & Support</h2>
+                <div class="help-container">
+                    <div class="help-section">
+                        <h3>Quick Start</h3>
+                        <ol>
+                            <li>Select a server from the Servers tab</li>
+                            <li>Go to Config tab to view configuration</li>
+                            <li>Download or copy the config</li>
+                            <li>Import into your VPN app (OpenVPN, V2Ray, or SSH client)</li>
+                            <li>Connect and enjoy!</li>
+                        </ol>
                     </div>
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" id="settings-email" placeholder="your@email.com">
-                    </div>
-                    <div class="form-group">
-                        <label>Current Plan</label>
-                        <input type="text" id="plan-info" placeholder="FREE - Expires in 30 days" disabled>
-                    </div>
-                    <button class="btn btn-primary" onclick="saveProfile()">Save Profile</button>
-                </div>
 
-                <div class="setting-section">
-                    <h3>API Keys</h3>
-                    <div class="api-key-box">
-                        <code id="api-key">sk_test_xxxxxxxxxxxxxxxx</code>
-                        <button class="btn btn-small" onclick="copyAPIKey()">Copy</button>
-                        <button class="btn btn-small" onclick="generateNewKey()">Generate New</button>
+                    <div class="help-section">
+                        <h3>Supported Protocols</h3>
+                        <ul>
+                            <li>🔒 <strong>OpenVPN UDP</strong> - Fast & Reliable</li>
+                            <li>⚡ <strong>V2Ray UDP</strong> - Ultra Fast</li>
+                            <li>🔐 <strong>SSH Tunnel</strong> - Secure</li>
+                        </ul>
+                    </div>
+
+                    <div class="help-section">
+                        <h3>FAQ</h3>
+                        <details>
+                            <summary>Why is my connection slow?</summary>
+                            <p>Try switching protocols. V2Ray is usually fastest. Also, select a closer server location.</p>
+                        </details>
+                        <details>
+                            <summary>Can I use multiple servers?</summary>
+                            <p>Yes! Create as many as you need. FREE tier allows 1 month trial.</p>
+                        </details>
+                        <details>
+                            <summary>How do I report bugs?</summary>
+                            <p>Email: support@zivpn.com or use the GitHub issues page.</p>
+                        </details>
                     </div>
                 </div>
+            </section>
+        </main>
 
-                <div class="setting-section">
-                    <h3>Billing</h3>
-                    <p>Current Balance: <strong>R0.00</strong></p>
-                    <button class="btn btn-primary" onclick="showPage('billing')">View Invoices</button>
-                    <button class="btn btn-secondary">Add Payment Method</button>
-                </div>
-            </div>
-        </div>
+        <!-- Notification Toast -->
+        <div id="notification" class="notification"></div>
     </div>
 
-    <!-- Notification Toast -->
-    <div id="notification" class="notification"></div>
-
+    <!-- QR Code Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
